@@ -36,19 +36,42 @@ def search_oeis(sequence):
     url = f"https://oeis.org/search?q={','.join(map(str, sequence))}&fmt=json"
     response = requests.get(url)
 
-    # 상태 코드 확인 및 디버깅 출력
+    # 상태 코드 확인
     if response.status_code != 200:
         st.write("API 요청 실패:", response.status_code)
         return None
 
     # 응답 데이터 확인
     data = response.json()
-    st.write("OEIS 응답 데이터:", data)  # 디버깅용 출력
-
-    # OEIS 검색 결과 확인
+    
+    # 검색 결과 확인
     if "results" in data and data["results"]:
-        return data["results"][:3]  # 최대 3개의 결과만 반환
+        results = data["results"][:3]  # 최대 3개의 결과만 반환
+        processed_results = []
+        
+        # 결과 처리
+        for result in results:
+            processed_result = {
+                "id": result["number"],
+                "name": result["name"],
+                "values": result["data"].split(",")[:10],  # 처음 10개 항목만 표시
+                "description": result.get("comment", ["No description available"])[0]  # 첫 번째 설명만 표시
+            }
+            processed_results.append(processed_result)
+        
+        return processed_results
     return None
+
+# Streamlit 앱 코드 예제
+def display_results(results):
+    if results:
+        for result in results:
+            st.write(f"**A{result['id']}: {result['name']}**")
+            st.write(f"처음 10개 항: {', '.join(result['values'])}")
+            st.write(f"설명: {result['description']}")
+            st.write(f"[OEIS에서 더 알아보기](https://oeis.org/A{result['id']})")
+    else:
+        st.write("OEIS에서 일치하는 수열을 찾을 수 없습니다.")
     
 # Streamlit UI 설정
 st.title("수열 예측기 및 OEIS 검색")
