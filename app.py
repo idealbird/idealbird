@@ -17,10 +17,12 @@ def main():
     # 검색 버튼이 눌렸을 때
     if st.button('검색'):
         try:
-            # 모든 입력 값이 정수인지 확인하고, 변환
+            # 입력 받은 값을 처리
             terms = [term1, term2, term3, term4]
-            terms = [str(int(term)) for term in terms]
-            sequence = ','.join(terms)
+
+            # 모든 값이 실수 형태로 입력되기 때문에 이를 정수로 변환
+            terms = [int(term) for term in terms if term is not None]
+            sequence = ','.join(map(str, terms))
 
             response = requests.get(f'https://oeis.org/search?seq={sequence}&fmt=json')
 
