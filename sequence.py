@@ -32,15 +32,24 @@ def find_pattern(seq):
     return None, "기본 패턴을 찾을 수 없습니다. OEIS 검색 결과를 확인해보세요."
 
 def search_oeis(sequence):
-    # OEIS API를 이용해 수열 검색
+    # OEIS API URL 설정
     url = f"https://oeis.org/search?q={','.join(map(str, sequence))}&fmt=json"
     response = requests.get(url)
-    if response.status_code == 200:
-        data = response.json()
-        if "results" in data:
-            return data["results"][:3]  # 최대 3개의 결과만 반환
-    return None
 
+    # 상태 코드 확인 및 디버깅 출력
+    if response.status_code != 200:
+        st.write("API 요청 실패:", response.status_code)
+        return None
+
+    # 응답 데이터 확인
+    data = response.json()
+    st.write("OEIS 응답 데이터:", data)  # 디버깅용 출력
+
+    # OEIS 검색 결과 확인
+    if "results" in data and data["results"]:
+        return data["results"][:3]  # 최대 3개의 결과만 반환
+    return None
+    
 # Streamlit UI 설정
 st.title("수열 예측기 및 OEIS 검색")
 st.write("수열의 첫 5개 항을 입력하고 다음 항을 예측하세요.")
